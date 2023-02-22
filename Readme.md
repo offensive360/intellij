@@ -55,7 +55,9 @@ Right Click on File Popup Menu to run scan from there.<br>
 
 <h4>Features</h4>
 Right click on any vulnerability to get menu where you can<br>
+
 ![popupview.png](./screenshots/popupview.png)
+ 
 
 1.<b>Go To Code</b> Double click on vulenrability to navigate to vulnerability ![resulttree.png](./screenshots/goto.png)<br>
 2.<b>Suppress</b> False positive Vulnerabilities ![eventlog.png](./screenshots/eventlog.png) <br>
