@@ -1,0 +1,62 @@
+<idea-plugin require-restart="true" url="https://offensive360.com">
+    <id>com.offensive360.plugin</id>
+    <name>offensive360</name>
+    <version>0.1</version>
+    <idea-version since-build="213" until-build="223.*"/>
+    <vendor email="info@offensive360.com" url="https://offensive360.com/">OFFENSIVE360</vendor>
+    <description>Offensive360 SAST Plugin For Intellij IDEA</description>
+    <description><![CDATA[
+Provides Inspection For Vulnerabilities In Source Code.
+The support includes:
+<ul>
+  <li>Source Code Analysis And Security Testing</li>
+  <li>Code navigation to vulnerable code</li>
+  <li>References to fix the code</li>
+  <li>Suppression of false positive vulnerabilities</li>
+</ul>
+<br/>
+<hr/>
+For more information visit the
+<a href="https://offensive360.com">project site</a>.
+]]></description>
+    <change-notes>Initial Release</change-notes>
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <toolWindow id="Offensive360"
+                    anchor="bottom"
+                    factoryClass="toolwindow.ToolWindowFactory"
+                    icon="icon.Offensive360Icons.ICON_OFFENSIVE360"
+                    doNotActivateOnStart="true">
+        </toolWindow>
+        <notificationGroup id="O360" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action
+                id="offensive360.ScanAll"
+                class="actions.MainMenu"
+                text="Offensive360:ScanAll"
+                icon="icon.Offensive360Icons.ICON_OFFENSIVE360"
+                description="Click to perform security scan">
+            <add-to-group  group-id="ToolsMenu" anchor="first"  />
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <add-to-group group-id="ToolWindowContextMenu" anchor="first"/>
+            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
+            <keyboard-shortcut first-keystroke="control alt O" second-keystroke="S" keymap="$default"/>
+        </action>
+        <action class="actions.SettingDialogAction"
+                id = "Offensive360.Settings"
+                text = "Offensive360:Settings"
+                icon = "icon.Offensive360Icons.SETTING_ICON"
+                description="Click to modify Offensive 360 Settings">
+            <add-to-group group-id="SettingsEntryPointGroup" anchor="first"/>
+        </action>
+
+        <action id="GoToCode" class="actions.GoToCodeAction" text="Navigate To File">
+
+        </action>
+    </actions>
+</idea-plugin>

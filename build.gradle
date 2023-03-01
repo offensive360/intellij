@@ -1,0 +1,54 @@
+plugins {
+    id 'org.jetbrains.intellij' version '1.13.0'
+    id 'java'
+}
+
+group 'org.offensive360'
+version '0.2'
+
+repositories {
+    mavenCentral()
+}
+
+buildSearchableOptions {
+    enabled = false
+}
+
+dependencies {
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    implementation "org.zeroturnaround:zt-zip:1.15"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
+    implementation 'com.konghq:unirest-java:3.11.09'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'commons-httpclient:commons-httpclient:3.1'
+    implementation 'com.pkulak.httpclient:httpclient:1.0.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+patchPluginXml {
+    changeNotes = """
+      Initial Release"""
+    sinceBuild = '212'
+    untilBuild = ''
+}
+
+intellij {
+    version = '2021.2'
+    updateSinceUntilBuild = false
+}
+
+//signPlugin {
+//    certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+//    privateKey.set(System.getenv("PRIVATE_KEY"))
+//    password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+//}
+
+
+publishPlugin {
+    token.set(System.getenv("PUBLISH_TOKEN"))
+}
+
+test {
+    useJUnitPlatform()
+}
