@@ -1,62 +1,81 @@
-<idea-plugin require-restart="true" url="https://offensive360.com">
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
     <id>com.offensive360.plugin</id>
-    <name>offensive360</name>
-    <version>0.1</version>
-    <idea-version since-build="213" until-build="223.*"/>
-    <vendor email="info@offensive360.com" url="https://offensive360.com/">OFFENSIVE360</vendor>
-    <description>Offensive360 SAST Plugin For Intellij IDEA</description>
-    <description><![CDATA[
-Provides Inspection For Vulnerabilities In Source Code.
-The support includes:
-<ul>
-  <li>Source Code Analysis And Security Testing</li>
-  <li>Code navigation to vulnerable code</li>
-  <li>References to fix the code</li>
-  <li>Suppression of false positive vulnerabilities</li>
-</ul>
-<br/>
-<hr/>
-For more information visit the
-<a href="https://offensive360.com">project site</a>.
-]]></description>
-    <change-notes>Initial Release</change-notes>
+    <name>Offensive360 SAST for Android Studio</name>
+    <version>1.2.2</version>
+    <vendor url="https://offensive360.com">Offensive360</vendor>
+
+    <description>
+        Offensive360 SAST for Android Studio — scan your Android and mobile application code
+        for vulnerabilities directly from the IDE.
+
+        Features:
+        - Direct source code analysis with token-based authentication
+        - Git repository scanning support
+        - Tabbed results panel with severity-coded findings
+        - Double-click navigation to vulnerable source lines
+        - Built-in fix guidance from the vulnerability knowledge base
+        - Dependency, malware, and license scanning
+        - Large codebase support (1 GB+)
+    </description>
+
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
-        <toolWindow id="Offensive360"
+        <projectConfigurable parentId="tools" id="com.offensive360.settings"
+                           displayName="Offensive360 SAST for Android Studio"
+                           instance="com.offensive360.intellij.settings.SettingsConfigurable"/>
+        <projectService serviceImplementation="com.offensive360.intellij.settings.PluginSettings"/>
+        <projectService serviceImplementation="com.offensive360.intellij.toolwindow.ScanResultsService"/>
+        <toolWindow id="Offensive360 Results"
                     anchor="bottom"
-                    factoryClass="toolwindow.ToolWindowFactory"
-                    icon="icon.Offensive360Icons.ICON_OFFENSIVE360"
-                    doNotActivateOnStart="true">
-        </toolWindow>
-        <notificationGroup id="O360" displayType="BALLOON"/>
+                    factoryClass="com.offensive360.intellij.toolwindow.ScanResultsToolWindowFactory"/>
     </extensions>
 
     <actions>
-        <action
-                id="offensive360.ScanAll"
-                class="actions.MainMenu"
-                text="Offensive360:ScanAll"
-                icon="icon.Offensive360Icons.ICON_OFFENSIVE360"
-                description="Click to perform security scan">
-            <add-to-group  group-id="ToolsMenu" anchor="first"  />
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
-            <add-to-group group-id="ToolWindowContextMenu" anchor="first"/>
-            <add-to-group group-id="ToolbarRunGroup" anchor="first"/>
-            <keyboard-shortcut first-keystroke="control alt O" second-keystroke="S" keymap="$default"/>
-        </action>
-        <action class="actions.SettingDialogAction"
-                id = "Offensive360.Settings"
-                text = "Offensive360:Settings"
-                icon = "icon.Offensive360Icons.SETTING_ICON"
-                description="Click to modify Offensive 360 Settings">
-            <add-to-group group-id="SettingsEntryPointGroup" anchor="first"/>
-        </action>
-
-        <action id="GoToCode" class="actions.GoToCodeAction" text="Navigate To File">
-
-        </action>
+        <group id="Offensive360.Menu" text="Offensive360" description="Offensive360 SAST for Android Studio">
+            <action id="Offensive360.ScanProject" class="com.offensive360.intellij.actions.ScanProjectAction"
+                    text="Scan with Offensive 360" description="Scan the current project for vulnerabilities with Offensive 360 SAST"/>
+            <action id="Offensive360.ScanGitRepo" class="com.offensive360.intellij.actions.ScanGitRepoAction"
+                    text="Scan Git Repository" description="Scan a Git repository for vulnerabilities"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="BuildMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
+        </group>
     </actions>
+
+    <change-notes>
+        <![CDATA[
+            <h2>1.2.2</h2>
+            <ul>
+                <li>Removed upper IDE build limit — compatible with all current and future Android Studio versions</li>
+                <li>Added ExternalScan API support for external role tokens</li>
+                <li>Enhanced vulnerability model with title, effect, and recommendation fields</li>
+                <li>Improved risk level parsing (handles both integer and string formats)</li>
+                <li>Cross-platform support (Windows, macOS, Linux)</li>
+            </ul>
+            <h2>1.1.0</h2>
+            <ul>
+                <li>Branded as Offensive360 SAST for Android Studio</li>
+                <li>Added tabbed results tool window with severity-coded tables</li>
+                <li>Added vulnerability knowledge base with offline fix guidance</li>
+                <li>Added Git repository scanning</li>
+                <li>Typed scan result models (language, dependency, malware, license)</li>
+                <li>Large codebase support via temp-file-based zip</li>
+                <li>Background task scanning with cancellation support</li>
+                <li>Improved authentication error messages</li>
+                <li>Paginated result retrieval</li>
+            </ul>
+            <h2>1.0.0</h2>
+            <ul>
+                <li>Initial release</li>
+                <li>Token-based authentication with O360 server</li>
+                <li>Project and Git repository scanning</li>
+                <li>Real-time vulnerability annotations</li>
+            </ul>
+        ]]>
+    </change-notes>
+
+    <idea-version since-build="221.0"/>
 </idea-plugin>
