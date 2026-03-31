@@ -58,7 +58,7 @@ public class ScanProjectAction extends AnAction {
                 return;
             }
 
-            SastClient client = new SastClient(settings.getEndpoint(), settings.getAccessToken());
+            SastClient client = new SastClient(settings.getEndpoint(), settings.getAccessToken(), settings.isAllowSelfSignedCerts());
 
             // Verify token with typed result
             progress.setText("Verifying authentication...");

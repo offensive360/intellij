@@ -238,7 +238,29 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
         if (vuln == null) return;
 
         String type = vuln.getType() != null ? vuln.getType() : vuln.getVulnerability();
-        String help = VulnerabilityKnowledgeBase.getFullHelp(type != null ? type : "");
+        VulnerabilityKnowledgeBase.KBEntry kbEntry = VulnerabilityKnowledgeBase.lookupVuln(type != null ? type : "");
+
+        String help;
+        if (kbEntry != null) {
+            help = VulnerabilityKnowledgeBase.getFullHelp(type);
+        } else {
+            // Use server-side recommendation and effect from the scan response
+            StringBuilder sb = new StringBuilder();
+            sb.append("== ").append(vuln.getTitle() != null ? vuln.getTitle() : type).append(" ==\n\n");
+            if (vuln.getEffect() != null && !vuln.getEffect().isEmpty()) {
+                sb.append("--- Impact ---\n").append(vuln.getEffect()).append("\n\n");
+            }
+            if (vuln.getRecommendation() != null && !vuln.getRecommendation().isEmpty()) {
+                sb.append("--- How to Fix ---\n").append(vuln.getRecommendation()).append("\n\n");
+            }
+            if (vuln.getReferences() != null && !vuln.getReferences().isEmpty()) {
+                sb.append("--- References ---\n").append(String.join("\n", vuln.getReferences())).append("\n");
+            }
+            if (sb.length() < 30) {
+                sb.append("No detailed guidance available for this vulnerability type.");
+            }
+            help = sb.toString();
+        }
 
         JTextArea textArea = new JTextArea(help);
         textArea.setEditable(false);
@@ -249,7 +271,7 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
         JOptionPane.showMessageDialog(this, scrollPane,
-            "Fix Guidance - " + (vuln.getType() != null ? vuln.getType() : "Vulnerability"),
+            "Fix Guidance - " + (vuln.getTitle() != null ? vuln.getTitle() : type),
             JOptionPane.INFORMATION_MESSAGE);
     }
 

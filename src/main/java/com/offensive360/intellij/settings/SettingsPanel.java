@@ -9,6 +9,7 @@ public class SettingsPanel {
     private JPanel mainPanel;
     private JTextField endpointTextField;
     private JPasswordField tokenPasswordField;
+    private JCheckBox selfSignedCertsCheckbox;
     private JLabel endpointLabel;
     private JLabel tokenLabel;
     private JLabel infoLabel;
@@ -60,6 +61,16 @@ public class SettingsPanel {
         helperLabel.setFont(helperLabel.getFont().deriveFont(10f));
         mainPanel.add(helperLabel);
 
+        // Self-signed certificate checkbox
+        JPanel sslPanel = new JPanel();
+        sslPanel.setLayout(new BoxLayout(sslPanel, BoxLayout.X_AXIS));
+        sslPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        selfSignedCertsCheckbox = new JCheckBox("Allow self-signed SSL certificates");
+        selfSignedCertsCheckbox.setToolTipText("Enable this if your server uses a self-signed or internal CA certificate");
+        sslPanel.add(selfSignedCertsCheckbox);
+        sslPanel.add(Box.createHorizontalGlue());
+        mainPanel.add(sslPanel);
+
         // Add stretch
         mainPanel.add(Box.createVerticalGlue());
     }
@@ -82,5 +93,13 @@ public class SettingsPanel {
 
     public void setAccessToken(String token) {
         tokenPasswordField.setText(token);
+    }
+
+    public boolean isAllowSelfSignedCerts() {
+        return selfSignedCertsCheckbox.isSelected();
+    }
+
+    public void setAllowSelfSignedCerts(boolean allow) {
+        selfSignedCertsCheckbox.setSelected(allow);
     }
 }

@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.offensive360.plugin</id>
     <name>Offensive360 SAST for Android Studio</name>
-    <version>1.2.2</version>
+    <version>1.2.0</version>
     <vendor url="https://offensive360.com">Offensive360</vendor>
 
     <description>
@@ -47,14 +47,6 @@
 
     <change-notes>
         <![CDATA[
-            <h2>1.2.2</h2>
-            <ul>
-                <li>Removed upper IDE build limit — compatible with all current and future Android Studio versions</li>
-                <li>Added ExternalScan API support for external role tokens</li>
-                <li>Enhanced vulnerability model with title, effect, and recommendation fields</li>
-                <li>Improved risk level parsing (handles both integer and string formats)</li>
-                <li>Cross-platform support (Windows, macOS, Linux)</li>
-            </ul>
             <h2>1.1.0</h2>
             <ul>
                 <li>Branded as Offensive360 SAST for Android Studio</li>

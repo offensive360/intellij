@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public final class PluginSettings implements PersistentStateComponent<PluginSettings> {
     public String endpoint = "https://sast.offensive360.com";
     public String accessToken = "";
+    public boolean allowSelfSignedCerts = false;
 
     public static PluginSettings getInstance(@NotNull Project project) {
         return project.getService(PluginSettings.class);
@@ -51,6 +52,14 @@ public final class PluginSettings implements PersistentStateComponent<PluginSett
 
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    public boolean isAllowSelfSignedCerts() {
+        return allowSelfSignedCerts;
+    }
+
+    public void setAllowSelfSignedCerts(boolean allowSelfSignedCerts) {
+        this.allowSelfSignedCerts = allowSelfSignedCerts;
     }
 
     public boolean isConfigured() {

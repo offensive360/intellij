@@ -92,7 +92,7 @@ public class ScanGitRepoAction extends AnAction {
     private void performGitScan(Project project, PluginSettings settings,
                                 String repoUrl, String branch, ProgressIndicator progress) {
         try {
-            SastClient client = new SastClient(settings.getEndpoint(), settings.getAccessToken());
+            SastClient client = new SastClient(settings.getEndpoint(), settings.getAccessToken(), settings.isAllowSelfSignedCerts());
 
             // Verify token
             progress.setText("Verifying authentication...");

@@ -38,7 +38,8 @@ public class SettingsConfigurable implements Configurable {
     public boolean isModified() {
         return settingsPanel != null && (
             !settingsPanel.getEndpoint().equals(settings.getEndpoint()) ||
-            !settingsPanel.getAccessToken().equals(settings.getAccessToken())
+            !settingsPanel.getAccessToken().equals(settings.getAccessToken()) ||
+            settingsPanel.isAllowSelfSignedCerts() != settings.isAllowSelfSignedCerts()
         );
     }
 
@@ -59,6 +60,7 @@ public class SettingsConfigurable implements Configurable {
 
         settings.setEndpoint(endpoint);
         settings.setAccessToken(accessToken);
+        settings.setAllowSelfSignedCerts(settingsPanel.isAllowSelfSignedCerts());
     }
 
     @Override
@@ -66,6 +68,7 @@ public class SettingsConfigurable implements Configurable {
         if (settingsPanel != null) {
             settingsPanel.setEndpoint(settings.getEndpoint());
             settingsPanel.setAccessToken(settings.getAccessToken());
+            settingsPanel.setAllowSelfSignedCerts(settings.isAllowSelfSignedCerts());
         }
     }
 

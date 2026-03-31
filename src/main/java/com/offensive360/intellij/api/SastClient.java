@@ -38,14 +38,38 @@ public class SastClient {
     private final Gson gson;
 
     public SastClient(String endpoint, String accessToken) {
+        this(endpoint, accessToken, false);
+    }
+
+    public SastClient(String endpoint, String accessToken, boolean allowSelfSignedCerts) {
         this.endpoint = endpoint.replaceAll("/$", "");
         this.accessToken = accessToken;
         this.isExternalRole = detectExternalRole(accessToken);
-        this.httpClient = new OkHttpClient.Builder()
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(600, TimeUnit.SECONDS)
-            .writeTimeout(600, TimeUnit.SECONDS)
-            .build();
+            .writeTimeout(600, TimeUnit.SECONDS);
+
+        if (allowSelfSignedCerts) {
+            try {
+                javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[]{
+                    new javax.net.ssl.X509TrustManager() {
+                        @Override public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {}
+                        @Override public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {}
+                        @Override public java.security.cert.X509Certificate[] getAcceptedIssuers() { return new java.security.cert.X509Certificate[0]; }
+                    }
+                };
+                javax.net.ssl.SSLContext sslContext = javax.net.ssl.SSLContext.getInstance("TLS");
+                sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                builder.sslSocketFactory(sslContext.getSocketFactory(), (javax.net.ssl.X509TrustManager) trustAllCerts[0]);
+                builder.hostnameVerifier((hostname, session) -> true);
+            } catch (Exception e) {
+                // Fall back to default SSL if setup fails
+            }
+        }
+
+        this.httpClient = builder.build();
         // Custom deserializers for server API quirks.
         this.gson = new GsonBuilder()
             // List<String> may come as array OR plain string
@@ -342,7 +366,27 @@ public class SastClient {
             }
 
             progress.setFraction(0.5);
-            return waitForScanAndFetchResults(projectId, projectName, progress);
+            ScanResult scanResult = waitForScanAndFetchResults(projectId, projectName, progress);
+            // Clean up: delete the project from the server after fetching results
+            deleteProject(projectId);
+            return scanResult;
+        }
+    }
+
+    /**
+     * Deletes a project from the server to avoid leaving scan artifacts in the dashboard.
+     */
+    private void deleteProject(String projectId) {
+        try {
+            String url = endpoint + PROJECT_ENDPOINT + "/" + projectId;
+            Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .delete()
+                .build();
+            httpClient.newCall(request).execute().close();
+        } catch (Exception e) {
+            // best-effort cleanup
         }
     }
 
@@ -489,16 +533,34 @@ public class SastClient {
      * Called immediately after scan completion — must be fast before server deletes ephemeral project.
      */
     private ScanResult getScanResults(String projectId) throws IOException {
+        // Retry up to 3 times with 5s delay — some servers need time to populate results after scan completes
+        for (int attempt = 0; attempt < 3; attempt++) {
+            ScanResult results = new ScanResult();
+            results.projectId = projectId;
+            results.languageVulnerabilities = getTypedResults(projectId, "/LangaugeScanResult",
+                new TypeToken<List<LangVulnerability>>() {}.getType());
+            results.dependencyVulnerabilities = getTypedResults(projectId, "/DependencyScanResult",
+                new TypeToken<List<DepVulnerability>>() {}.getType());
+            results.malwareResults = getTypedResults(projectId, "/MalwareScanResult",
+                new TypeToken<List<MalwareResult>>() {}.getType());
+            results.licenseIssues = getTypedResults(projectId, "/LicenseScanResult",
+                new TypeToken<List<LicenseIssue>>() {}.getType());
+
+            if (results.getTotalCount() > 0) {
+                return results;
+            }
+
+            // Results not ready yet, wait and retry
+            if (attempt < 2) {
+                try { Thread.sleep(5000); } catch (InterruptedException e) { break; }
+            }
+        }
+
+        // Return whatever we have (may be empty if server truly found nothing)
         ScanResult results = new ScanResult();
         results.projectId = projectId;
         results.languageVulnerabilities = getTypedResults(projectId, "/LangaugeScanResult",
             new TypeToken<List<LangVulnerability>>() {}.getType());
-        results.dependencyVulnerabilities = getTypedResults(projectId, "/DependencyScanResult",
-            new TypeToken<List<DepVulnerability>>() {}.getType());
-        results.malwareResults = getTypedResults(projectId, "/MalwareScanResult",
-            new TypeToken<List<MalwareResult>>() {}.getType());
-        results.licenseIssues = getTypedResults(projectId, "/LicenseScanResult",
-            new TypeToken<List<LicenseIssue>>() {}.getType());
         return results;
     }
 
