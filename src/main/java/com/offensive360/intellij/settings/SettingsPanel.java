@@ -34,7 +34,7 @@ public class SettingsPanel {
 
         endpointLabel = new JLabel("Server URL:");
         endpointLabel.setPreferredSize(new java.awt.Dimension(150, 30));
-        endpointTextField = new JTextField("https://sast.offensive360.com");
+        endpointTextField = new JTextField("");
         endpointTextField.setColumns(40);
         endpointPanel.add(endpointLabel);
         endpointPanel.add(Box.createHorizontalStrut(10));

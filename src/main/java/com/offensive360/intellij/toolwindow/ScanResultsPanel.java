@@ -73,22 +73,15 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
         langTable = createTable(langModel);
         addDoubleClickNavigation(langTable, this::navigateToLangVuln);
         addContextMenu(langTable, this::showLangFixGuidance);
-        tabbedPane.addTab("Language Vulnerabilities", new JScrollPane(langTable));
+        tabbedPane.addTab("Vulnerabilities", new JScrollPane(langTable));
 
+        // Dependencies, Malware, Licenses tabs removed — only vulnerability results shown
         depModel = new DepTableModel();
         depTable = createTable(depModel);
-        addContextMenu(depTable, this::showDepFixGuidance);
-        tabbedPane.addTab("Dependencies", new JScrollPane(depTable));
-
         malwareModel = new MalwareTableModel();
         malwareTable = createTable(malwareModel);
-        addContextMenu(malwareTable, null);
-        tabbedPane.addTab("Malware", new JScrollPane(malwareTable));
-
         licenseModel = new LicenseTableModel();
         licenseTable = createTable(licenseModel);
-        addContextMenu(licenseTable, null);
-        tabbedPane.addTab("Licenses", new JScrollPane(licenseTable));
 
         cardPanel.add(tabbedPane, CARD_RESULTS);
         add(cardPanel, BorderLayout.CENTER);

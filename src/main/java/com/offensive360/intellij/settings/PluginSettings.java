@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
     storages = @Storage("offensive360.xml")
 )
 public final class PluginSettings implements PersistentStateComponent<PluginSettings> {
-    public String endpoint = "https://sast.offensive360.com";
+    public String endpoint = "";
     public String accessToken = "";
     public boolean allowSelfSignedCerts = false;
 
@@ -39,7 +39,7 @@ public final class PluginSettings implements PersistentStateComponent<PluginSett
     }
 
     public String getEndpoint() {
-        return endpoint != null ? endpoint : "https://sast.offensive360.com";
+        return endpoint != null ? endpoint : "";
     }
 
     public void setEndpoint(String endpoint) {
@@ -63,7 +63,8 @@ public final class PluginSettings implements PersistentStateComponent<PluginSett
     }
 
     public boolean isConfigured() {
-        return getAccessToken() != null && !getAccessToken().isEmpty()
+        return getEndpoint() != null && !getEndpoint().isEmpty()
+            && getAccessToken() != null && !getAccessToken().isEmpty()
             && getAccessToken().startsWith("ey");
     }
 }

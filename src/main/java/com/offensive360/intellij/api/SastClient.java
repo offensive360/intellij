@@ -533,34 +533,47 @@ public class SastClient {
      * Called immediately after scan completion — must be fast before server deletes ephemeral project.
      */
     private ScanResult getScanResults(String projectId) throws IOException {
-        // Retry up to 3 times with 5s delay — some servers need time to populate results after scan completes
-        for (int attempt = 0; attempt < 3; attempt++) {
-            ScanResult results = new ScanResult();
-            results.projectId = projectId;
-            results.languageVulnerabilities = getTypedResults(projectId, "/LangaugeScanResult",
-                new TypeToken<List<LangVulnerability>>() {}.getType());
-            results.dependencyVulnerabilities = getTypedResults(projectId, "/DependencyScanResult",
-                new TypeToken<List<DepVulnerability>>() {}.getType());
-            results.malwareResults = getTypedResults(projectId, "/MalwareScanResult",
-                new TypeToken<List<MalwareResult>>() {}.getType());
-            results.licenseIssues = getTypedResults(projectId, "/LicenseScanResult",
-                new TypeToken<List<LicenseIssue>>() {}.getType());
-
-            if (results.getTotalCount() > 0) {
-                return results;
+        // Wait for the server to populate results — check project vulnerabilitiesCount first
+        for (int attempt = 0; attempt < 12; attempt++) {
+            try {
+                // Check if the project has vulnerabilities counted
+                String statusUrl = endpoint + PROJECT_ENDPOINT + "/" + projectId;
+                Request statusReq = new Request.Builder()
+                    .url(statusUrl)
+                    .addHeader("Authorization", "Bearer " + accessToken)
+                    .get()
+                    .build();
+                try (Response statusResp = httpClient.newCall(statusReq).execute()) {
+                    if (statusResp.isSuccessful()) {
+                        String body = statusResp.body().string();
+                        JsonObject project = gson.fromJson(body, JsonObject.class);
+                        int vulnCount = project.has("vulnerabilitiesCount") ? project.get("vulnerabilitiesCount").getAsInt() : 0;
+                        if (vulnCount > 0) {
+                            // Server has counted vulns — now fetch the detailed results
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore check errors, proceed to fetch anyway
+                break;
             }
-
-            // Results not ready yet, wait and retry
-            if (attempt < 2) {
-                try { Thread.sleep(5000); } catch (InterruptedException e) { break; }
-            }
+            try { Thread.sleep(5000); } catch (InterruptedException e) { break; }
         }
 
-        // Return whatever we have (may be empty if server truly found nothing)
+        // Now fetch the actual results
         ScanResult results = new ScanResult();
         results.projectId = projectId;
         results.languageVulnerabilities = getTypedResults(projectId, "/LangaugeScanResult",
             new TypeToken<List<LangVulnerability>>() {}.getType());
+
+        // If still empty after waiting, try one more time after 10s
+        if (results.languageVulnerabilities.isEmpty()) {
+            try { Thread.sleep(10000); } catch (InterruptedException e) { /* ignore */ }
+            results.languageVulnerabilities = getTypedResults(projectId, "/LangaugeScanResult",
+                new TypeToken<List<LangVulnerability>>() {}.getType());
+        }
+
         return results;
     }
 
