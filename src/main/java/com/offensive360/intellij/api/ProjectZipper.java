@@ -90,6 +90,15 @@ public class ProjectZipper {
             });
         }
 
+        // Check zip size - warn if too large for reliable upload
+        long zipSize = tempFile.length();
+        long maxSize = 500L * 1024 * 1024; // 500MB
+        if (zipSize > maxSize) {
+            tempFile.delete();
+            throw new IOException("Project is too large to scan (" + (zipSize / 1024 / 1024) + " MB). "
+                + "Maximum supported size is 500 MB. Try scanning a specific subfolder instead.");
+        }
+
         return tempFile;
     }
 
