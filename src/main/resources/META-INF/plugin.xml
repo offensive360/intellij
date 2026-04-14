@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.offensive360.plugin</id>
+    <name>Offensive360 SAST</name>
+    <version>1.1.15</version>
+    <vendor url="https://offensive360.com">Offensive360</vendor>
+
+    <description>
+        Offensive360 SAST for IntelliJ IDEA and Android Studio -- scan your application code
+        for vulnerabilities directly from the IDE.
+
+        Features:
+        - Direct source code analysis with token-based authentication
+        - Git repository scanning support
+        - Tabbed results panel with severity-coded findings
+        - Tabbed detail view (Details / How to Fix / References) for each finding
+        - Double-click navigation to vulnerable source lines
+        - Built-in fix guidance from the vulnerability knowledge base
+        - CWE reference links for each vulnerability type
+        - Retry with exponential backoff for reliable scanning
+        - Large codebase support (1 GB+) with 4-hour timeout
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable parentId="tools" id="com.offensive360.settings"
+                           displayName="Offensive360 SAST"
+                           instance="com.offensive360.intellij.settings.SettingsConfigurable"/>
+        <projectService serviceImplementation="com.offensive360.intellij.settings.PluginSettings"/>
+        <projectService serviceImplementation="com.offensive360.intellij.toolwindow.ScanResultsService"/>
+        <postStartupActivity implementation="com.offensive360.intellij.UpdateChecker"/>
+        <notificationGroup id="Offensive360" displayType="BALLOON"/>
+        <toolWindow id="Offensive360 Results"
+                    anchor="bottom"
+                    factoryClass="com.offensive360.intellij.toolwindow.ScanResultsToolWindowFactory"/>
+    </extensions>
+
+    <actions>
+        <group id="Offensive360.Menu" text="Offensive360" description="Offensive360 SAST">
+            <action id="Offensive360.ScanProject" class="com.offensive360.intellij.actions.ScanProjectAction"
+                    text="Scan with Offensive 360" description="Scan the current project for vulnerabilities with Offensive 360 SAST"/>
+            <action id="Offensive360.ScanGitRepo" class="com.offensive360.intellij.actions.ScanGitRepoAction"
+                    text="Scan Git Repository" description="Scan a Git repository for vulnerabilities"/>
+            <separator/>
+            <action id="Offensive360.CheckUpdate" class="com.offensive360.intellij.actions.CheckUpdateAction"
+                    text="Check for Updates" description="Check for Offensive 360 plugin updates"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="BuildMenu" anchor="last"/>
+            <add-to-group group-id="MainMenu" anchor="before" relative-to-action="HelpMenu"/>
+        </group>
+    </actions>
+
+    <change-notes>
+        <![CDATA[
+            <h2>1.1.15</h2>
+            <ul>
+                <li>KeepInvisibleAndDeletePostScan=True: scans leave no trace on the dashboard</li>
+                <li>Inline ExternalScan results (no post-scan /LangaugeScanResult fetch)</li>
+                <li>Retry with exponential backoff (0/15/30/60/120/240s) for reliability</li>
+                <li>4-hour read/write timeout for very large projects</li>
+                <li>Base64 decode for code snippets from the server</li>
+                <li>File exclusions aligned with VS and Android Studio plugins</li>
+                <li>50MB per-file size cap and backup folder pattern exclusion</li>
+                <li>Tabbed detail view: Details / How to Fix / References</li>
+                <li>CWE reference links extracted from vulnerability data</li>
+                <li>Human-readable titles in the findings table</li>
+                <li>Check for Updates action in the Tools menu</li>
+                <li>Update checker uses offensive360/intellij GitHub releases</li>
+            </ul>
+            <h2>1.0.0</h2>
+            <ul>
+                <li>Initial release</li>
+                <li>Token-based authentication with O360 server</li>
+                <li>Project and Git repository scanning</li>
+                <li>Real-time vulnerability annotations</li>
+            </ul>
+        ]]>
+    </change-notes>
+
+    <idea-version since-build="221.0"/>
+</idea-plugin>
