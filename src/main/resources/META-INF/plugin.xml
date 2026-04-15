@@ -2,7 +2,7 @@
 <idea-plugin>
     <id>com.offensive360.plugin</id>
     <name>Offensive360 SAST</name>
-    <version>1.1.16</version>
+    <version>1.1.17</version>
     <vendor url="https://offensive360.com">Offensive360</vendor>
 
     <description>
@@ -54,6 +54,10 @@
 
     <change-notes>
         <![CDATA[
+            <h2>1.1.17</h2>
+            <ul>
+                <li>Findings whose source line drifts from the actual code are now re-located against your local file, so navigation lands on the correct line. Findings that cannot be located in your sources are hidden to avoid misleading you.</li>
+            </ul>
             <h2>1.1.16</h2>
             <ul>
                 <li>Fixed: clicking a finding in a sorted results table now navigates to the correct file and line</li>

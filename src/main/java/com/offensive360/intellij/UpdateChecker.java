@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class UpdateChecker implements StartupActivity.DumbAware {
 
-    private static final String CURRENT_VERSION = "1.1.16";
+    private static final String CURRENT_VERSION = "1.1.17";
     private static final String RELEASES_API_URL = "https://api.github.com/repos/offensive360/intellij/releases/latest";
     private static final String USER_AGENT = "Offensive360-IntelliJ-Plugin/" + CURRENT_VERSION;
     private static final long CACHE_TTL_MS = 24L * 60 * 60 * 1000;
