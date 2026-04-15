@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugins>
+  <plugin id="com.offensive360.plugin"
+          url="https://github.com/offensive360/intellij/releases/download/v1.1.16/Offensive360-IntelliJ-Plugin-1.1.16.zip"
+          version="1.1.16">
+    <name>Offensive360 SAST</name>
+    <vendor url="https://offensive360.com">Offensive360</vendor>
+    <description>Offensive360 SAST for IntelliJ IDEA — scan your application code for vulnerabilities directly from the IDE.</description>
+    <change-notes>Navigation from sorted findings table fixed.</change-notes>
+    <idea-version since-build="221.0"/>
+  </plugin>
+</plugins>
