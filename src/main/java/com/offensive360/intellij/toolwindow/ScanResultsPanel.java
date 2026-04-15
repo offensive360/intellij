@@ -130,9 +130,10 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
         // Selection listener for detail view
         langTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                int row = langTable.getSelectedRow();
-                if (row >= 0) {
-                    showDetail(langModel.getRow(row));
+                int viewRow = langTable.getSelectedRow();
+                if (viewRow >= 0) {
+                    int modelRow = langTable.convertRowIndexToModel(viewRow);
+                    showDetail(langModel.getRow(modelRow));
                 }
             }
         });
@@ -156,13 +157,13 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
 
             private void handlePopup(MouseEvent e) {
                 if (!e.isPopupTrigger()) return;
-                int row = langTable.rowAtPoint(e.getPoint());
-                if (row < 0) return;
-                langTable.setRowSelectionInterval(row, row);
+                int viewRow = langTable.rowAtPoint(e.getPoint());
+                if (viewRow < 0) return;
+                langTable.setRowSelectionInterval(viewRow, viewRow);
 
                 JPopupMenu menu = new JPopupMenu();
                 JMenuItem copyItem = new JMenuItem("Copy Row");
-                copyItem.addActionListener(ev -> copyRowToClipboard(langTable, row));
+                copyItem.addActionListener(ev -> copyRowToClipboard(langTable, viewRow));
                 menu.add(copyItem);
                 menu.show(langTable, e.getX(), e.getY());
             }
@@ -668,10 +669,11 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
     // -- Navigation --
 
     private void navigateToLangVuln() {
-        int row = langTable.getSelectedRow();
-        if (row < 0) return;
+        int viewRow = langTable.getSelectedRow();
+        if (viewRow < 0) return;
+        int modelRow = langTable.convertRowIndexToModel(viewRow);
 
-        LangVulnerability vuln = langModel.getRow(row);
+        LangVulnerability vuln = langModel.getRow(modelRow);
         if (vuln == null || vuln.getFilePath() == null) return;
 
         String basePath = project.getBasePath();
