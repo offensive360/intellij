@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.offensive360"
-version = "1.1.17"
+version = "1.1.18"
 
 repositories {
     mavenCentral()

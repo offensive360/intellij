@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
   <plugin id="com.offensive360.plugin"
-          url="https://github.com/offensive360/intellij/releases/download/v1.1.17/Offensive360-IntelliJ-Plugin-1.1.17.zip"
-          version="1.1.17">
+          url="https://github.com/offensive360/intellij/releases/download/v1.1.18/Offensive360-IntelliJ-Plugin-1.1.18.zip"
+          version="1.1.18">
     <name>Offensive360 SAST</name>
     <vendor url="https://offensive360.com">Offensive360</vendor>
     <description>Offensive360 SAST for IntelliJ IDEA — scan your application code for vulnerabilities directly from the IDE.</description>
-    <change-notes>Findings re-located against local source so navigation lands on the correct line; mismatched findings hidden.</change-notes>
+    <change-notes>Findings displayed exactly as the dashboard shows them; no client-side rewriting.</change-notes>
     <idea-version since-build="221.0"/>
   </plugin>
 </plugins>

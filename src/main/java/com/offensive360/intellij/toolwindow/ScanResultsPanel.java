@@ -622,10 +622,10 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
     }
 
     private void refreshFromService(ScanResultsService service) {
-        List<LangVulnerability> raw = service.getLangVulnerabilities();
-        FindingLineCorrector.Result correction = FindingLineCorrector.apply(
-            raw, project, this::resolveVulnFile);
-        List<LangVulnerability> vulns = correction.findings;
+        // RECONCILIATION CONTRACT: the panel shows EXACTLY what the server
+        // returned — no filtering, no dedup, no client-side rewrite. UI count
+        // == server count == dashboard count, always.
+        List<LangVulnerability> vulns = service.getLangVulnerabilities();
         langModel.setData(vulns);
 
         if (vulns != null && !vulns.isEmpty()) {
@@ -641,15 +641,9 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
                     case "low": low++; break;
                 }
             }
-            StringBuilder text = new StringBuilder();
-            text.append(vulns.size()).append(" findings - Critical: ").append(critical)
-                .append("  High: ").append(high).append("  Medium: ").append(medium)
-                .append("  Low: ").append(low);
-            if (correction.corrected > 0) text.append("  (").append(correction.corrected).append(" re-located)");
-            if (correction.dropped > 0) text.append("  (").append(correction.dropped).append(" hidden \u2014 source mismatch)");
-            statusLabel.setText(text.toString());
+            statusLabel.setText(vulns.size() + " findings - Critical: " + critical
+                + "  High: " + high + "  Medium: " + medium + "  Low: " + low);
 
-            // Auto-select first row
             if (langTable.getRowCount() > 0) {
                 langTable.setRowSelectionInterval(0, 0);
             }
@@ -659,27 +653,6 @@ public class ScanResultsPanel extends JPanel implements ScanResultsService.Chang
         } else {
             cardLayout.show(cardPanel, CARD_EMPTY);
         }
-    }
-
-    /** File resolver used by FindingLineCorrector. Mirrors navigateToLangVuln() lookup. */
-    private VirtualFile resolveVulnFile(LangVulnerability vuln) {
-        if (vuln == null) return null;
-        String basePath = project.getBasePath();
-        String filePath = vuln.getFilePath();
-        if (filePath != null && !filePath.isEmpty()) {
-            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(filePath);
-            if (vf != null) return vf;
-            if (basePath != null) {
-                String full = (basePath + File.separator + filePath).replace('\\', '/');
-                vf = LocalFileSystem.getInstance().findFileByPath(full);
-                if (vf != null) return vf;
-            }
-        }
-        if (basePath != null && vuln.getFileName() != null && !vuln.getFileName().isEmpty()) {
-            String full = (basePath + File.separator + vuln.getFileName()).replace('\\', '/');
-            return LocalFileSystem.getInstance().findFileByPath(full);
-        }
-        return null;
     }
 
     // -- Clipboard --
